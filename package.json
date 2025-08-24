@@ -2,14 +2,19 @@
   "name": "meat-reception-app",
   "version": "1.0.0",
   "description": "Meat Reception Application - Monorepo with Flask API and mobile app",
+  "type": "module",
   "private": true,
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "scripts": {
+    "start": "cd apps/web && npm start",
+    "build": "cd apps/web && npm install && npm run build",
+    "heroku-postbuild": "cd apps/web && npm install && npm run build",
     "install:api": "cd apps/api && pip install -r requirements-dev.txt",
     "dev:api": "cd apps/api && flask run",
+    "dev:web": "cd apps/web && npm run dev",
     "test:api": "cd apps/api && pytest",
     "lint:api": "cd apps/api && black src/ tests/ && isort src/ tests/ && flake8 src/ tests/",
     "type-check:api": "cd apps/api && mypy src/",
@@ -37,7 +42,8 @@
     "bser": "^2.1.1",
     "fb-watchman": "^2.0.2",
     "json-schema-traverse": "^1.0.0",
-    "lodash.pick": "^3.1.0"
+    "lodash.pick": "^3.1.0",
+    "express": "^5.1.0"
   },
   "devDependencies": {
     "@react-native-community/cli": "^20.0.1"

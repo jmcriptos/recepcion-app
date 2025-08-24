@@ -279,10 +279,10 @@
 			<key>isShown</key>
 			<false/>
 		</dict>
-		<key>React.xcscheme_^#shared#^_</key>
+		<key>React.xcscheme</key>
 		<dict>
 			<key>isShown</key>
-			<true/>
+			<false/>
 		</dict>
 		<key>ReactCommon.xcscheme</key>
 		<dict>
