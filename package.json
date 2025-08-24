@@ -1,0 +1,45 @@
+{
+  "name": "meat-reception-app",
+  "version": "1.0.0",
+  "description": "Meat Reception Application - Monorepo with Flask API and mobile app",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "install:api": "cd apps/api && pip install -r requirements-dev.txt",
+    "dev:api": "cd apps/api && flask run",
+    "test:api": "cd apps/api && pytest",
+    "lint:api": "cd apps/api && black src/ tests/ && isort src/ tests/ && flake8 src/ tests/",
+    "type-check:api": "cd apps/api && mypy src/",
+    "security:api": "cd apps/api && bandit -r src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/your-username/meat-reception-app.git"
+  },
+  "keywords": [
+    "meat",
+    "reception",
+    "flask",
+    "api",
+    "mobile",
+    "monorepo"
+  ],
+  "author": "Your Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "dependencies": {
+    "bser": "^2.1.1",
+    "fb-watchman": "^2.0.2",
+    "json-schema-traverse": "^1.0.0",
+    "lodash.pick": "^3.1.0"
+  },
+  "devDependencies": {
+    "@react-native-community/cli": "^20.0.1"
+  }
+}

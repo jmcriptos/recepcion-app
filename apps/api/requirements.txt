@@ -1,0 +1,45 @@
+# Flask and core dependencies
+Flask==2.3.3
+Werkzeug==2.3.7
+
+# Database and ORM
+SQLAlchemy==2.0.23
+Flask-SQLAlchemy==3.1.1
+Flask-Migrate==4.0.5
+psycopg2-binary==2.9.7
+
+# Authentication
+Flask-Login==0.6.3
+Flask-Session==0.5.0
+
+# Environment and configuration
+python-dotenv==1.0.0
+
+# Caching
+redis==5.0.1
+
+# Image processing (for Cloudinary integration)
+cloudinary==1.36.0
+Pillow==10.0.1
+
+# OCR processing
+pytesseract==0.3.10
+opencv-python==4.8.1.78
+google-cloud-vision==3.4.4
+
+# HTTP client for external APIs
+requests==2.31.0
+
+# JSON serialization
+marshmallow==3.20.1
+flask-marshmallow==0.15.0
+marshmallow-sqlalchemy==0.29.0
+
+# CORS support
+Flask-CORS==4.0.0
+
+# Production server
+gunicorn==21.2.0
+
+# System monitoring
+psutil==5.9.6

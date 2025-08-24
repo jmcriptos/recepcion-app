@@ -1,0 +1,81 @@
+name: CI - Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: meat_reception_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    
+    - name: Install dependencies
+      working-directory: ./apps/api
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-dev.txt
+    
+    - name: Set up environment variables
+      run: |
+        echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/meat_reception_test" >> $GITHUB_ENV
+        echo "SECRET_KEY=test-secret-key-for-ci" >> $GITHUB_ENV
+        echo "TESTING=true" >> $GITHUB_ENV
+        echo "LOG_LEVEL=INFO" >> $GITHUB_ENV
+    
+    - name: Run database migrations
+      working-directory: ./apps/api
+      run: |
+        cd src
+        flask db upgrade
+    
+    - name: Run tests with pytest
+      working-directory: ./apps/api
+      run: |
+        python -m pytest tests/ -v --tb=short --disable-warnings
+    
+    - name: Test health endpoint
+      working-directory: ./apps/api/src
+      run: |
+        python -c "
+        from app import create_app
+        app = create_app('testing')
+        app.config['DATABASE_URL'] = 'sqlite:///:memory:'
+        with app.test_client() as client:
+            response = client.get('/health')
+            assert response.status_code == 200
+            data = response.get_json()
+            assert data['status'] == 'healthy'
+            print('✓ Health endpoint test passed')
+        "

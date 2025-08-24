@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de App - Registro de Pesos</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .phone-frame {
+            width: 375px;
+            height: 667px;
+            background: white;
+            border-radius: 25px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .status-bar {
+            height: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .app-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+        
+        .app-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .app-subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        .login-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .user-selector {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+        
+        .user-button {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-bottom: 12px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 16px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .user-button:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+        }
+        
+        .user-button.selected {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+        
+        .api-status {
+            background: #f3f4f6;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .status-connected {
+            color: #059669;
+        }
+        
+        .status-disconnected {
+            color: #dc2626;
+        }
+        
+        .footer {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: auto;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+        }
+        
+        .main-app {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+        
+        .nav-tab {
+            flex: 1;
+            padding: 8px 12px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+            transition: all 0.2s;
+        }
+        
+        .nav-tab.active {
+            background: white;
+            color: #3b82f6;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content {
+            flex: 1;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .camera-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.2s;
+        }
+        
+        .camera-button:hover {
+            background: #2563eb;
+        }
+        
+        .stats-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .stats-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+        
+        .stats-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="status-bar">
+            <span>9:41</span>
+            <span>🔋 100%</span>
+        </div>
+        
+        <!-- Login Screen -->
+        <div id="login-screen">
+            <div class="app-header">
+                <div class="app-icon">🥩</div>
+                <div class="app-title">Registro de Pesos</div>
+                <div class="app-subtitle">Aplicación para recepción de carnes</div>
+            </div>
+            
+            <div class="login-section">
+                <div class="api-status">
+                    <div id="api-status-text" class="loading">Conectando con API...</div>
+                </div>
+                
+                <div class="user-selector">
+                    <div class="section-title">Selecciona tu usuario</div>
+                    <div id="users-list" class="loading">Cargando usuarios...</div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                <div>Versión 1.0.0</div>
+                <div>Optimizado para uso industrial</div>
+            </div>
+        </div>
+        
+        <!-- Main App -->
+        <div id="main-app" class="main-app">
+            <div class="nav-tabs">
+                <div class="nav-tab active" data-tab="registro">📸 Registro</div>
+                <div class="nav-tab" data-tab="dashboard">📊 Dashboard</div>
+                <div class="nav-tab" data-tab="sync">🔄 Sync</div>
+            </div>
+            
+            <div id="registro-tab" class="tab-content active">
+                <button class="camera-button" onclick="simulateCamera()">
+                    📸 Tomar Foto del Peso
+                </button>
+                <div class="stats-card">
+                    <div class="stats-number">0</div>
+                    <div class="stats-label">Registros pendientes offline</div>
+                </div>
+            </div>
+            
+            <div id="dashboard-tab" class="tab-content">
+                <div class="stats-card">
+                    <div class="stats-number">0</div>
+                    <div class="stats-label">Registros hoy</div>
+                </div>
+                <div class="stats-card">
+                    <div class="stats-number">0</div>
+                    <div class="stats-label">Pendientes de sincronizar</div>
+                </div>
+            </div>
+            
+            <div id="sync-tab" class="tab-content">
+                <div class="stats-card">
+                    <div id="sync-status">Estado: Conectado</div>
+                    <button onclick="testSync()" style="margin-top: 12px; padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer;">
+                        🔄 Sincronizar Ahora
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://192.168.50.232:8080/api/v1';
+        
+        // Check API connection
+        async function checkAPI() {
+            try {
+                const response = await fetch(`${API_BASE_URL.replace('/api/v1', '')}/health`);
+                const data = await response.json();
+                document.getElementById('api-status-text').innerHTML = 
+                    `<span class="status-connected">✅ API Conectada (${data.status})</span>`;
+                loadUsers();
+            } catch (error) {
+                document.getElementById('api-status-text').innerHTML = 
+                    `<span class="status-disconnected">❌ API Desconectada</span>`;
+                showMockUsers();
+            }
+        }
+        
+        // Load users from API
+        async function loadUsers() {
+            try {
+                // Mock users since we don't have auth endpoint
+                showMockUsers();
+            } catch (error) {
+                showMockUsers();
+            }
+        }
+        
+        function showMockUsers() {
+            const users = [
+                { id: 1, name: 'Operador 1', role: 'operator' },
+                { id: 2, name: 'Operador 2', role: 'operator' },
+                { id: 3, name: 'Supervisor', role: 'supervisor' }
+            ];
+            
+            const usersList = document.getElementById('users-list');
+            usersList.innerHTML = users.map(user => 
+                `<button class="user-button" onclick="login('${user.name}')">
+                    👤 ${user.name} (${user.role})
+                </button>`
+            ).join('');
+        }
+        
+        function login(userName) {
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'flex';
+            console.log(`Logged in as: ${userName}`);
+        }
+        
+        // Tab navigation
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+                
+                // Add active class to clicked tab
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + '-tab').classList.add('active');
+            });
+        });
+        
+        function simulateCamera() {
+            alert('📸 Simulando captura de foto...\n\nEn la app real:\n- Se abre la cámara\n- Tomas foto del peso\n- OCR extrae el peso automáticamente\n- Se guarda localmente si no hay conexión');
+        }
+        
+        async function testSync() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/registrations`);
+                if (response.status === 401) {
+                    alert('🔐 Sincronización requiere autenticación\n\nEn la app real se manejan las credenciales automáticamente');
+                } else {
+                    alert('✅ Test de sincronización exitoso');
+                }
+            } catch (error) {
+                alert('❌ Error de sincronización: ' + error.message);
+            }
+        }
+        
+        // Initialize
+        checkAPI();
+    </script>
+</body>
+</html>

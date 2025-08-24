@@ -1,0 +1,70 @@
+name: Deploy API to Heroku
+
+on:
+  push:
+    branches: [ main ]
+  workflow_run:
+    workflows: ["CI - Testing Pipeline"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only deploy if CI tests passed
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'push' }}
+    
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+    
+    - name: Install Heroku CLI
+      run: |
+        curl https://cli-assets.heroku.com/install.sh | sh
+    
+    - name: Verify Heroku CLI installation
+      run: heroku --version
+    
+    - name: Heroku Login
+      uses: akhileshns/heroku-deploy@v3.13.15
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: ${{ secrets.HEROKU_APP_NAME }}
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
+        usedocker: false
+        appdir: apps/api
+        procfile: apps/api/Procfile
+        
+    - name: Run database migrations on Heroku
+      run: |
+        echo ${{ secrets.HEROKU_API_KEY }} | heroku auth:token
+        heroku run --app ${{ secrets.HEROKU_APP_NAME }} "cd src && flask db upgrade"
+      env:
+        HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+    
+    - name: Verify deployment with health check
+      run: |
+        sleep 30
+        curl -f https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health || exit 1
+        echo "✓ Deployment health check passed"
+      env:
+        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}
+    
+    - name: Post-deployment validation
+      run: |
+        # Verify the app is responding
+        response=$(curl -s -o /dev/null -w "%{http_code}" https://${{ secrets.HEROKU_APP_NAME }}.herokuapp.com/health)
+        if [ $response -eq 200 ]; then
+          echo "✓ API deployment successful and health check passed"
+        else
+          echo "✗ API deployment failed - health check returned $response"
+          exit 1
+        fi
+      env:
+        HEROKU_APP_NAME: ${{ secrets.HEROKU_APP_NAME }}

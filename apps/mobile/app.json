@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Registro de Pesos",
+    "slug": "meat-reception-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "userInterfaceStyle": "light",
+    "main": "./index.js",
+    "splash": {
+      "backgroundColor": "#3b82f6"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "com.meatreception.app"
+    },
+    "web": {
+      "bundler": "metro"
+    },
+    "packagerOpts": {
+      "config": "metro.config.js"
+    }
+  }
+}

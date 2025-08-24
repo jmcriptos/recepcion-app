@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Registro Pesos">
+    <title>Registro de Pesos - App Real</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            overflow-x: hidden;
+            height: 100vh;
+            position: fixed;
+            width: 100%;
+        }
+        
+        .app-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            max-width: 100vw;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            font-size: 14px;
+            font-weight: 600;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .screen.active {
+            display: flex;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            padding: 40px 24px;
+            justify-content: space-between;
+        }
+        
+        .app-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+        }
+        
+        .app-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 8px;
+        }
+        
+        .app-subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .status-card {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .status-text {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .user-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .user-button {
+            background: white;
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            font-size: 16px;
+            color: #374151;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .user-button:active {
+            background: #f9fafb;
+            border-color: #3b82f6;
+            transform: scale(0.98);
+        }
+        
+        .footer {
+            text-align: center;
+            color: #9ca3af;
+            font-size: 14px;
+            margin-top: 40px;
+        }
+        
+        /* Dashboard Screen */
+        .dashboard-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .welcome-text {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .logout-button {
+            color: #dc2626;
+            font-size: 14px;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #f9fafb;
+            margin: 16px;
+            border-radius: 12px;
+            padding: 4px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 12px 8px;
+            border-radius: 8px;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #6b7280;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #3b82f6;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .tab-panel {
+            display: none;
+        }
+        
+        .tab-panel.active {
+            display: block;
+        }
+        
+        /* Buttons */
+        .camera-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 24px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            width: 100%;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .camera-button:active {
+            background: #2563eb;
+            transform: scale(0.98);
+        }
+        
+        .manual-button {
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-bottom: 20px;
+            width: 100%;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .manual-button:active {
+            background: #4b5563;
+            transform: scale(0.98);
+        }
+        
+        /* Stats Cards */
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .stats-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #3b82f6;
+            margin-bottom: 4px;
+        }
+        
+        .stats-label {
+            color: #6b7280;
+            font-size: 14px;
+        }
+        
+        /* Registration Screen */
+        .screen-header {
+            background: white;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .back-button {
+            color: #3b82f6;
+            font-size: 16px;
+            font-weight: 500;
+            background: none;
+            border: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+        }
+        
+        .screen-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .form-content {
+            flex: 1;
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .input {
+            width: 100%;
+            background: white;
+            border: 2px solid #d1d5db;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            -webkit-appearance: none;
+        }
+        
+        .input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .primary-button {
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            width: 100%;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .primary-button:active {
+            background: #047857;
+            transform: scale(0.98);
+        }
+        
+        .secondary-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .secondary-button:active {
+            background: #2563eb;
+            transform: scale(0.98);
+        }
+        
+        /* Sync Screen */
+        .sync-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .sync-status {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        
+        .sync-button {
+            background: #059669;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 12px;
+            width: 100%;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .sync-button:active {
+            background: #047857;
+            transform: scale(0.98);
+        }
+        
+        .refresh-button {
+            background: #f3f4f6;
+            color: #374151;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        
+        .refresh-button:active {
+            background: #e5e7eb;
+            transform: scale(0.98);
+        }
+        
+        /* Recent registrations */
+        .recent-section {
+            margin-top: 24px;
+        }
+        
+        .registration-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .reg-weight {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1f2937;
+        }
+        
+        .reg-time {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        
+        .reg-status {
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        /* Loading animation */
+        .loading {
+            text-align: center;
+            color: #6b7280;
+            font-style: italic;
+            padding: 20px;
+        }
+        
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            top: 60px;
+            left: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            border-radius: 8px;
+            padding: 16px;
+            transform: translateY(-100px);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+        }
+        
+        /* PWA styles */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #3b82f6;
+            color: white;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            display: none;
+        }
+        
+        .install-button {
+            background: white;
+            color: #3b82f6;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar">
+            <span id="current-time">9:41</span>
+            <span id="network-status">🔋 100%</span>
+        </div>
+        
+        <!-- Login Screen -->
+        <div id="login-screen" class="screen login-screen active">
+            <div class="app-header">
+                <div class="app-icon">🥩</div>
+                <div class="app-title">Registro de Pesos</div>
+                <div class="app-subtitle">Aplicación para recepción de carnes</div>
+            </div>
+            
+            <div class="status-card">
+                <div id="api-status" class="status-text loading">Conectando con API...</div>
+            </div>
+            
+            <div class="user-section">
+                <div class="section-title">Selecciona tu usuario</div>
+                <button class="user-button" onclick="login('Operador 1', 'operator')">
+                    👤 Operador 1 (operator)
+                </button>
+                <button class="user-button" onclick="login('Operador 2', 'operator')">
+                    👤 Operador 2 (operator)
+                </button>
+                <button class="user-button" onclick="login('Supervisor', 'supervisor')">
+                    👤 Supervisor (supervisor)
+                </button>
+            </div>
+            
+            <div class="footer">
+                <div>Versión 1.0.0</div>
+                <div style="font-size: 12px; margin-top: 4px;">Optimizado para uso industrial</div>
+            </div>
+        </div>
+        
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <div class="dashboard-header">
+                <div class="welcome-text" id="welcome-text">Hola, Usuario</div>
+                <button class="logout-button" onclick="logout()">Cerrar Sesión</button>
+            </div>
+            
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('register')">📸 Registro</button>
+                <button class="tab" onclick="showTab('dashboard')">📊 Dashboard</button>
+                <button class="tab" onclick="showTab('sync')">🔄 Sync</button>
+            </div>
+            
+            <div class="tab-content">
+                <!-- Register Tab -->
+                <div id="register-tab" class="tab-panel active">
+                    <button class="camera-button" onclick="simulateCamera()">
+                        📸 Tomar Foto del Peso
+                    </button>
+                    
+                    <button class="manual-button" onclick="showScreen('register')">
+                        ✏️ Registro Manual
+                    </button>
+                    
+                    <div class="stats-card">
+                        <div class="stats-number" id="pending-count">0</div>
+                        <div class="stats-label">Registros pendientes offline</div>
+                    </div>
+                </div>
+                
+                <!-- Dashboard Tab -->
+                <div id="dashboard-tab" class="tab-panel">
+                    <div class="stats-card">
+                        <div class="stats-number" id="total-count">0</div>
+                        <div class="stats-label">Registros totales</div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-number" id="sync-pending-count">0</div>
+                        <div class="stats-label">Pendientes de sincronizar</div>
+                    </div>
+                    
+                    <div class="stats-card">
+                        <div class="stats-number" id="today-count">0</div>
+                        <div class="stats-label">Registros hoy</div>
+                    </div>
+                    
+                    <div id="recent-section" class="recent-section" style="display: none;">
+                        <div class="section-title">Últimos registros:</div>
+                        <div id="recent-list"></div>
+                    </div>
+                </div>
+                
+                <!-- Sync Tab -->
+                <div id="sync-tab" class="tab-panel">
+                    <div class="sync-card">
+                        <div class="sync-status" id="sync-status">Estado: 🔴 Verificando...</div>
+                        
+                        <button class="sync-button" onclick="syncData()">
+                            🔄 Sincronizar Ahora
+                        </button>
+                        
+                        <button class="refresh-button" onclick="checkAPI()">
+                            🔄 Verificar Conexión
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Registration Screen -->
+        <div id="register-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-button" onclick="showScreen('dashboard')">← Atrás</button>
+                <div class="screen-title">Registro Manual</div>
+                <div style="width: 50px;"></div>
+            </div>
+            
+            <div class="form-content">
+                <div class="form-group">
+                    <label class="label">Peso (kg):</label>
+                    <input type="number" class="input" id="weight-input" placeholder="Ej: 2.45" step="0.01">
+                </div>
+                
+                <button class="primary-button" onclick="saveRegistration()">
+                    💾 Guardar Registro
+                </button>
+                
+                <button class="secondary-button" onclick="simulateCamera()">
+                    📸 Tomar Foto con OCR
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast notification -->
+    <div id="toast" class="toast"></div>
+    
+    <!-- PWA install prompt -->
+    <div id="install-prompt" class="install-prompt">
+        Instala la app en tu iPhone
+        <button class="install-button" onclick="installApp()">Instalar</button>
+    </div>
+
+    <script>
+        // App State
+        let currentUser = null;
+        let apiConnected = false;
+        let registrations = JSON.parse(localStorage.getItem('registrations') || '[]');
+        const API_BASE_URL = 'http://192.168.50.232:8080';
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            updateTime();
+            setInterval(updateTime, 1000);
+            checkAPI();
+            updateStats();
+            
+            // PWA support
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js');
+            }
+            
+            // Install prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                document.getElementById('install-prompt').style.display = 'block';
+            });
+        });
+
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                now.getHours().toString().padStart(2, '0') + ':' + 
+                now.getMinutes().toString().padStart(2, '0');
+        }
+
+        async function checkAPI() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                apiConnected = true;
+                document.getElementById('api-status').innerHTML = 
+                    '<span style="color: #059669">✅ API Conectada</span>';
+                document.getElementById('sync-status').textContent = 'Estado: 🟢 Conectado';
+                document.getElementById('network-status').textContent = '📶 WiFi';
+            } catch (error) {
+                apiConnected = false;
+                document.getElementById('api-status').innerHTML = 
+                    '<span style="color: #dc2626">❌ API Desconectada</span>';
+                document.getElementById('sync-status').textContent = 'Estado: 🔴 Desconectado';
+                document.getElementById('network-status').textContent = '📵 Sin red';
+            }
+        }
+
+        function login(name, role) {
+            currentUser = { name, role };
+            document.getElementById('welcome-text').textContent = `Hola, ${name}`;
+            showScreen('dashboard');
+            showToast(`¡Bienvenido, ${name}! 👋`);
+        }
+
+        function logout() {
+            currentUser = null;
+            showScreen('login');
+            showToast('Sesión cerrada');
+        }
+
+        function showScreen(screenName) {
+            // Hide all screens
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show target screen
+            document.getElementById(screenName + '-screen').classList.add('active');
+        }
+
+        function showTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+
+        function simulateCamera() {
+            // Simulate native alert
+            const result = confirm(
+                '📸 Simulando cámara nativa\n\n' +
+                'En la app real:\n' +
+                '• Se abre la cámara del iPhone\n' +
+                '• Tomas foto del peso en la báscula\n' +
+                '• OCR extrae el número automáticamente\n' +
+                '• Se guarda localmente si no hay conexión\n\n' +
+                '¿Quieres simular un peso detectado?'
+            );
+            
+            if (result) {
+                const simulatedWeight = (Math.random() * 5 + 1).toFixed(2);
+                document.getElementById('weight-input').value = simulatedWeight;
+                showScreen('register');
+                showToast(`OCR detectó: ${simulatedWeight} kg 🎯`);
+            }
+        }
+
+        function saveRegistration() {
+            const weightInput = document.getElementById('weight-input');
+            const weight = parseFloat(weightInput.value);
+            
+            if (!weight || weight <= 0) {
+                alert('Error: Ingresa un peso válido');
+                return;
+            }
+
+            const registration = {
+                id: Date.now(),
+                weight: weight,
+                timestamp: new Date().toISOString(),
+                user: currentUser.name,
+                synced: false
+            };
+
+            registrations.push(registration);
+            localStorage.setItem('registrations', JSON.stringify(registrations));
+            
+            weightInput.value = '';
+            updateStats();
+            
+            const message = `Registro guardado! ✅\n\n` +
+                           `Peso: ${weight} kg\n` +
+                           `Usuario: ${currentUser.name}\n\n` +
+                           `${apiConnected ? 'Se sincronizará automáticamente' : 'Guardado localmente (sin conexión)'}`;
+            
+            alert(message);
+            
+            showScreen('dashboard');
+            showTab('dashboard');
+            showToast(`Peso ${weight} kg guardado ✅`);
+        }
+
+        async function syncData() {
+            if (!apiConnected) {
+                alert('Sin conexión: No se puede sincronizar sin conexión a la API');
+                return;
+            }
+
+            const pendingRegs = registrations.filter(r => !r.synced);
+            
+            if (pendingRegs.length === 0) {
+                showToast('No hay registros pendientes');
+                return;
+            }
+
+            try {
+                // Simulate sync delay
+                showToast('Sincronizando... ⏳');
+                
+                setTimeout(() => {
+                    const message = `Sincronización 🔄\n\n` +
+                                   `En la app real se enviarían ${pendingRegs.length} registros a la API.\n\n` +
+                                   `Por seguridad, se requiere autenticación real.`;
+                    alert(message);
+                    showToast('Sincronización simulada ✅');
+                }, 1000);
+                
+            } catch (error) {
+                alert('Error: Error en la sincronización');
+                showToast('Error de sincronización ❌');
+            }
+        }
+
+        function updateStats() {
+            const total = registrations.length;
+            const pending = registrations.filter(r => !r.synced).length;
+            const today = registrations.filter(r => {
+                const regDate = new Date(r.timestamp).toDateString();
+                const todayDate = new Date().toDateString();
+                return regDate === todayDate;
+            }).length;
+
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('pending-count').textContent = pending;
+            document.getElementById('sync-pending-count').textContent = pending;
+            document.getElementById('today-count').textContent = today;
+
+            // Show recent registrations
+            if (total > 0) {
+                const recentSection = document.getElementById('recent-section');
+                const recentList = document.getElementById('recent-list');
+                
+                recentSection.style.display = 'block';
+                recentList.innerHTML = '';
+                
+                registrations.slice(-3).reverse().forEach(reg => {
+                    const card = document.createElement('div');
+                    card.className = 'registration-card';
+                    card.innerHTML = `
+                        <div class="reg-weight">${reg.weight} kg</div>
+                        <div class="reg-time">${new Date(reg.timestamp).toLocaleTimeString()}</div>
+                        <div class="reg-status" style="color: ${reg.synced ? '#059669' : '#f59e0b'}">
+                            ${reg.synced ? '✅ Sincronizado' : '⏳ Pendiente'}
+                        </div>
+                    `;
+                    recentList.appendChild(card);
+                });
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showToast('App instalada ✅');
+                    }
+                    deferredPrompt = null;
+                    document.getElementById('install-prompt').style.display = 'none';
+                });
+            } else {
+                // iOS Safari instructions
+                if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                    alert('Para instalar en iOS:\n\n1. Toca el botón Compartir ⎙\n2. Selecciona "Añadir a pantalla de inicio"\n3. Toca "Añadir"');
+                } else {
+                    showToast('Funcionalidad no disponible');
+                }
+            }
+        }
+
+        // Prevent zoom on input focus (iOS)
+        document.addEventListener('focusin', function(e) {
+            if (e.target.matches('input')) {
+                setTimeout(() => {
+                    e.target.scrollIntoView({ block: 'center' });
+                }, 300);
+            }
+        });
+
+        // Handle device orientation
+        window.addEventListener('orientationchange', function() {
+            setTimeout(() => {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+    </script>
+</body>
+</html>

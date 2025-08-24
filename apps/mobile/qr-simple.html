@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code - Registro de Pesos</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        
+        .title {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+        
+        .qr-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .qr-large {
+            font-size: 300px;
+            line-height: 1;
+            margin: 20px 0;
+        }
+        
+        .url-box {
+            background: #f1f5f9;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Monaco', monospace;
+            font-size: 18px;
+            color: #1e293b;
+            word-break: break-all;
+            font-weight: bold;
+        }
+        
+        .instructions {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #234e52;
+            margin-top: 0;
+            font-size: 20px;
+        }
+        
+        .instructions ol {
+            color: #2c7a7b;
+            font-size: 16px;
+        }
+        
+        .instructions li {
+            margin: 12px 0;
+            line-height: 1.5;
+        }
+        
+        .manual-option {
+            background: #fef7e0;
+            border: 1px solid #f6ad55;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .manual-option h3 {
+            color: #744210;
+            margin-top: 0;
+        }
+        
+        .copy-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 10px;
+            transition: background 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background: #2563eb;
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 15px 0;
+        }
+        
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .alternatives {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .alternatives h3 {
+            color: #374151;
+            margin-top: 0;
+        }
+        
+        .alternatives a {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 5px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        
+        .alternatives a:hover {
+            background: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🥩 Registro de Pesos</div>
+        <div class="subtitle">Aplicación de Recepción de Carnes</div>
+        
+        <div class="status online">✅ Servidor activo en puerto 8081</div>
+        
+        <div class="qr-container">
+            <div class="qr-large">📱</div>
+            <p><strong>QR Code Manual:</strong></p>
+            <p>Usa la cámara de tu teléfono para escanear esta URL:</p>
+        </div>
+        
+        <div class="url-box" id="expo-url">
+            exp://192.168.50.223:19000
+        </div>
+        
+        <button class="copy-btn" onclick="copyUrl()">📋 Copiar URL</button>
+        
+        <div class="instructions">
+            <h3>📱 Instrucciones paso a paso:</h3>
+            <ol>
+                <li><strong>Descarga "Expo Go"</strong> en tu teléfono:
+                    <br>• iOS: App Store → "Expo Go"
+                    <br>• Android: Play Store → "Expo Go"
+                </li>
+                <li><strong>Abre Expo Go</strong> en tu dispositivo</li>
+                <li><strong>Toca "Scan QR Code"</strong> en la app</li>
+                <li><strong>Apunta la cámara</strong> hacia la URL de arriba</li>
+                <li><strong>¡La app se carga automáticamente!</strong> 🚀</li>
+            </ol>
+        </div>
+        
+        <div class="manual-option">
+            <h3>⌨️ Opción Manual:</h3>
+            <p><strong>Si el QR no funciona:</strong></p>
+            <ol>
+                <li>Abre Expo Go en tu teléfono</li>
+                <li>Toca "Enter URL manually"</li>
+                <li>Escribe: <code>exp://192.168.50.223:19000</code></li>
+                <li>Toca "Connect"</li>
+            </ol>
+        </div>
+        
+        <div class="alternatives">
+            <h3>🌐 Alternativas (sin teléfono):</h3>
+            <a href="http://localhost:8081" target="_blank">🌐 Abrir en Web</a>
+            <a href="./web-simulator.html" target="_blank">📱 Simulador Web</a>
+        </div>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f0f9ff; border-radius: 8px;">
+            <h3>🔧 Información técnica:</h3>
+            <p><strong>IP Local:</strong> 192.168.50.223</p>
+            <p><strong>Puerto Metro:</strong> 8081</p>
+            <p><strong>Puerto Expo:</strong> 19000</p>
+            <p><strong>Estado:</strong> <span id="server-status">Verificando...</span></p>
+        </div>
+    </div>
+
+    <script>
+        function copyUrl() {
+            const url = document.getElementById('expo-url').textContent;
+            navigator.clipboard.writeText(url).then(() => {
+                alert('✅ URL copiada al portapapeles!\n\nPega esta URL en Expo Go manualmente.');
+            }).catch(() => {
+                alert('URL para copiar:\n' + url);
+            });
+        }
+        
+        // Check server status
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('http://localhost:8081');
+                document.getElementById('server-status').textContent = '✅ Metro corriendo';
+                document.getElementById('server-status').style.color = '#059669';
+            } catch (error) {
+                document.getElementById('server-status').textContent = '❌ Metro desconectado';
+                document.getElementById('server-status').style.color = '#dc2626';
+            }
+        }
+        
+        // Check status every 5 seconds
+        checkServerStatus();
+        setInterval(checkServerStatus, 5000);
+        
+        // Generate actual QR code using Google Charts API
+        function generateQRWithGoogle() {
+            const url = 'exp://192.168.50.223:19000';
+            const qrUrl = `https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=${encodeURIComponent(url)}`;
+            
+            const qrContainer = document.querySelector('.qr-container');
+            qrContainer.innerHTML = `
+                <img src="${qrUrl}" alt="QR Code" style="max-width: 300px; border: 4px solid #3b82f6; border-radius: 12px;">
+                <p style="margin-top: 15px; color: #666; font-size: 14px;">Escanea con Expo Go</p>
+            `;
+        }
+        
+        // Try to load Google QR
+        setTimeout(generateQRWithGoogle, 1000);
+    </script>
+</body>
+</html>

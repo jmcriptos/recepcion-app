@@ -1,0 +1,2 @@
+# Root requirements.txt - points Heroku to the API subdirectory
+-r apps/api/requirements.txt

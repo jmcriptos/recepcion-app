@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Codes - Registro de Pesos</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .title {
+            font-size: 36px;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            font-size: 18px;
+        }
+        
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .qr-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .qr-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .qr-card h3 {
+            color: #2d3748;
+            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        
+        .qr-code-img {
+            width: 250px;
+            height: 250px;
+            border: 4px solid #3b82f6;
+            border-radius: 12px;
+            margin: 20px auto;
+            display: block;
+        }
+        
+        .url-display {
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Monaco', monospace;
+            font-size: 14px;
+            color: #4a5568;
+            word-break: break-all;
+        }
+        
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .status-online {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status-offline {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+        
+        .instructions {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .instructions h3 {
+            color: #2d3748;
+            font-size: 24px;
+            margin-top: 0;
+        }
+        
+        .step-list {
+            color: #4a5568;
+            font-size: 16px;
+        }
+        
+        .step-list li {
+            margin: 12px 0;
+        }
+        
+        .alternatives {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin-top: 30px;
+            color: white;
+            text-align: center;
+        }
+        
+        .alternatives h3 {
+            margin-top: 0;
+            font-size: 24px;
+        }
+        
+        .alt-button {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            text-decoration: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background 0.2s;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .alt-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+        }
+        
+        .troubleshooting {
+            background: #fef5e7;
+            border: 2px solid #f6ad55;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .troubleshooting h4 {
+            color: #744210;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="title">🥩 Registro de Pesos</div>
+            <div class="subtitle">Selecciona la opción que mejor funcione para ti</div>
+            <div id="server-status" class="status-indicator status-offline">🔍 Verificando servidor...</div>
+        </div>
+        
+        <div class="qr-grid">
+            <!-- Expo QR (para dispositivos móviles) -->
+            <div class="qr-card">
+                <h3>📱 Para Teléfonos (Expo)</h3>
+                <img src="expo-qr.png" alt="Expo QR Code" class="qr-code-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjVGNUY1Ii8+Cjx0ZXh0IHg9IjEyNSIgeT0iMTI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiM5OTkiPvCfk7E8L3RleHQ+Cjx0ZXh0IHg9IjEyNSIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM2NjYiPkV4cG8gUVI8L3RleHQ+Cjwvc3ZnPgo='">
+                <div class="url-display">exp://192.168.50.223:19000</div>
+                <div class="troubleshooting">
+                    <h4>Si no funciona:</h4>
+                    <p>1. Instala "Expo Go" desde tu app store<br>
+                    2. Abre Expo Go<br>
+                    3. Toca "Enter URL manually"<br>
+                    4. Pega: exp://192.168.50.223:19000</p>
+                </div>
+            </div>
+            
+            <!-- Web QR (para navegadores) -->
+            <div class="qr-card">
+                <h3>🌐 Para Navegadores Web</h3>
+                <img src="web-qr.png" alt="Web QR Code" class="qr-code-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjVGNUY1Ii8+Cjx0ZXh0IHg9IjEyNSIgeT0iMTI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiM5OTkiPvCfjJA8L3RleHQ+Cjx0ZXh0IHg9IjEyNSIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM2NjYiPldlYiBRUjwvdGV4dD4KPHN2Zz4K'">
+                <div class="url-display">http://192.168.50.223:8081</div>
+                <div class="troubleshooting">
+                    <h4>Funciona en:</h4>
+                    <p>• Cualquier navegador web<br>
+                    • Computadora o teléfono<br>
+                    • Sin instalar apps adicionales</p>
+                </div>
+            </div>
+            
+            <!-- Localhost QR -->
+            <div class="qr-card">
+                <h3>💻 Localhost (Solo esta Mac)</h3>
+                <img src="local-qr.png" alt="Local QR Code" class="qr-code-img" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgdmlld0JveD0iMCAwIDI1MCAyNTAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIyNTAiIGhlaWdodD0iMjUwIiBmaWxsPSIjRjVGNUY1Ii8+Cjx0ZXh0IHg9IjEyNSIgeT0iMTI1IiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iNjAiIGZpbGw9IiM5OTkiPvCfkrs8L3RleHQ+Cjx0ZXh0IHg9IjEyNSIgeT0iMTgwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM2NjYiPkxvY2FsIFFSPC90ZXh0Pgo8L3N2Zz4K'">
+                <div class="url-display">http://localhost:8081</div>
+                <div class="troubleshooting">
+                    <h4>Solo para:</h4>
+                    <p>• Esta misma computadora<br>
+                    • Navegador en esta Mac<br>
+                    • Testing local rápido</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📋 Instrucciones paso a paso</h3>
+            <ol class="step-list">
+                <li><strong>Para móvil:</strong> Escanea el QR "Para Teléfonos" con Expo Go</li>
+                <li><strong>Para web:</strong> Escanea el QR "Para Navegadores" con cualquier cámara</li>
+                <li><strong>Para local:</strong> Escanea el QR "Localhost" o ve directamente a localhost:8081</li>
+            </ol>
+        </div>
+        
+        <div class="alternatives">
+            <h3>🚀 Enlaces directos</h3>
+            <a href="http://localhost:8081" class="alt-button" target="_blank">💻 Abrir en esta Mac</a>
+            <a href="./web-simulator.html" class="alt-button" target="_blank">📱 Ver Simulador</a>
+            <a href="http://192.168.50.223:8081" class="alt-button" target="_blank">🌐 Abrir en Red</a>
+        </div>
+    </div>
+
+    <script>
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('http://localhost:8081');
+                if (response.ok) {
+                    document.getElementById('server-status').textContent = '✅ Servidor funcionando';
+                    document.getElementById('server-status').className = 'status-indicator status-online';
+                } else {
+                    throw new Error('Server not responding');
+                }
+            } catch (error) {
+                document.getElementById('server-status').textContent = '❌ Servidor desconectado';
+                document.getElementById('server-status').className = 'status-indicator status-offline';
+            }
+        }
+        
+        // Check status immediately and then every 10 seconds
+        checkServerStatus();
+        setInterval(checkServerStatus, 10000);
+    </script>
+</body>
+</html>

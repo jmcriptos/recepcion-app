@@ -1,0 +1,1 @@
+web: cd apps/api && gunicorn src.wsgi:app

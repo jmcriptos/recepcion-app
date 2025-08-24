@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expo QR Code - Registro de Pesos</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+        
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        
+        .qr-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        #qrcode {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .instructions {
+            background: #e6fffa;
+            border: 1px solid #81e6d9;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .instructions h3 {
+            color: #234e52;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .instructions ol {
+            color: #2c7a7b;
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin: 8px 0;
+        }
+        
+        .url-info {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+        
+        .url-info strong {
+            color: #2d3748;
+        }
+        
+        .url {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #f1f5f9;
+            padding: 8px 12px;
+            border-radius: 6px;
+            color: #1e293b;
+            word-break: break-all;
+            font-size: 14px;
+        }
+        
+        .status {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .status.online {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status.offline {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .refresh-btn {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: background 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            background: #3182ce;
+        }
+        
+        .loading {
+            color: #718096;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🥩 Registro de Pesos</div>
+        <div class="subtitle">Escanea el QR para abrir en tu dispositivo móvil</div>
+        
+        <div id="status" class="status loading">⚡ Verificando conexión...</div>
+        
+        <div class="qr-container">
+            <div id="qrcode"></div>
+            <div id="qr-loading" class="loading">Generando QR Code...</div>
+        </div>
+        
+        <div class="url-info">
+            <strong>URL de la aplicación:</strong><br>
+            <div id="app-url" class="url">Cargando...</div>
+        </div>
+        
+        <div class="instructions">
+            <h3>📱 Cómo usar en tu teléfono:</h3>
+            <ol>
+                <li><strong>iOS:</strong> Descarga "Expo Go" desde App Store</li>
+                <li><strong>Android:</strong> Descarga "Expo Go" desde Play Store</li>
+                <li>Abre la app Expo Go en tu teléfono</li>
+                <li>Escanea este QR code con la app</li>
+                <li>¡La aplicación se cargará automáticamente!</li>
+            </ol>
+        </div>
+        
+        <div class="url-info">
+            <strong>Alternativas:</strong><br>
+            • Web: <a href="http://localhost:8081" target="_blank">http://localhost:8081</a><br>
+            • Simulador web: <a href="./web-simulator.html" target="_blank">Ver simulador</a>
+        </div>
+        
+        <button class="refresh-btn" onclick="location.reload()">🔄 Actualizar</button>
+    </div>
+
+    <script>
+        const LOCAL_IP = '192.168.50.223';
+        const PORT = '8081';
+        
+        // Expo URL format
+        const expoUrl = `exp://${LOCAL_IP}:19000`;
+        const webUrl = `http://${LOCAL_IP}:${PORT}`;
+        
+        // Update URL display
+        document.getElementById('app-url').textContent = expoUrl;
+        
+        // Generate QR Code
+        QRCode.toCanvas(document.getElementById('qrcode'), expoUrl, {
+            width: 280,
+            height: 280,
+            colorDark: '#2d3748',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.M
+        }, function (error) {
+            const loadingEl = document.getElementById('qr-loading');
+            if (error) {
+                console.error(error);
+                loadingEl.textContent = 'Error al generar QR Code';
+                loadingEl.style.color = '#e53e3e';
+            } else {
+                loadingEl.style.display = 'none';
+            }
+        });
+        
+        // Check Metro/Expo status
+        async function checkStatus() {
+            try {
+                const response = await fetch(`http://${LOCAL_IP}:${PORT}/status`);
+                document.getElementById('status').innerHTML = '✅ Servidor activo';
+                document.getElementById('status').className = 'status online';
+            } catch (error) {
+                try {
+                    // Fallback check
+                    const response = await fetch(`http://localhost:${PORT}`);
+                    document.getElementById('status').innerHTML = '✅ Servidor local activo';
+                    document.getElementById('status').className = 'status online';
+                } catch (e) {
+                    document.getElementById('status').innerHTML = '❌ Servidor desconectado';
+                    document.getElementById('status').className = 'status offline';
+                }
+            }
+        }
+        
+        // Check status on load
+        setTimeout(checkStatus, 1000);
+        
+        // Check status every 30 seconds
+        setInterval(checkStatus, 30000);
+    </script>
+</body>
+</html>
