@@ -1,0 +1,24 @@
+{
+  "name": "Meat Reception Scanner",
+  "description": "Web application for meat reception with mobile camera scanning capabilities",
+  "repository": "https://github.com/jmcriptos/recepcion-app",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["react", "typescript", "camera", "ocr", "meat", "reception", "scanning"],
+  "env": {
+    "NODE_ENV": {
+      "description": "Environment (production/development)",
+      "value": "production"
+    }
+  },
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  },
+  "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    }
+  ]
+}
